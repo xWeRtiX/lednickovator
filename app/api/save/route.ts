@@ -5,35 +5,19 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request): Promise<Response> {
   try {
-    const contentType = req.headers.get('Content-Type');
-    if (!contentType || !contentType.includes('application/json')) {
-      console.error('Invalid Content-Type:', contentType);
-      return NextResponse.json(
-        { error: 'Content-Type must be application/json' },
-        { status: 400 }
-      );
-    }
+    const data: { fridge: string; shelf: string; name: string } =
+      await req.json();
 
-    const body = await req.text(); // Prozkoumáme syrové tělo
-    console.log('Raw body received:', body);
-
-    const data = JSON.parse(body);
-    if (!data || typeof data !== 'object') {
-      console.error('Invalid JSON body:', data);
-      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-    }
-
-    const { fridge, shelf, name } = data;
-    if (!fridge || !shelf || !name) {
-      console.error('Missing required fields:', data);
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+    if (!data.fridge || !data.shelf || !data.name) {
+      return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }
 
     await prisma.package.create({
-      data: { fridge, shelf, name },
+      data: {
+        fridge: data.fridge,
+        shelf: data.shelf,
+        name: data.name.toLowerCase(),
+      },
     });
 
     return NextResponse.json(

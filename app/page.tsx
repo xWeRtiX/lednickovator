@@ -10,49 +10,35 @@ interface PackageData {
 
 async function savePackage(data: PackageData): Promise<void> {
   if (!data.fridge || !data.shelf || !data.name) {
-    console.error('Invalid data:', data);
+    console.error('Neplatná data:', data);
     return;
   }
-
-  try {
-    const response = await fetch('/api/save', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data), // Posíláme tělo jako JSON
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      console.error('Save failed:', errorData?.error || response.statusText);
-    }
-  } catch (error) {
-    console.error('Error sending save request:', error);
-  }
+  await fetch('/api/save', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
 }
 
 async function searchPackages(name: string): Promise<PackageData[]> {
   if (!name) {
-    console.error('Search name is empty');
+    console.error('Vyhledávací jméno je prázdné');
     return [];
   }
-
-  try {
-    const response = await fetch(
-      `/api/search?name=${encodeURIComponent(name)}`
-    );
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      console.error('Search failed:', errorData?.error || response.statusText);
-      return [];
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error searching packages:', error);
+  const response = await fetch(
+    `/api/search?name=${encodeURIComponent(name.toLowerCase())}`
+  );
+  if (!response.ok) {
+    console.error('Vyhledávání selhalo:', response.statusText);
     return [];
   }
+  const results: PackageData[] = await response.json();
+  return results.map((result) => ({
+    ...result,
+    name: result.name.charAt(0).toUpperCase() + result.name.slice(1), // Uprav první písmeno na velké
+  }));
 }
 
 export default function Home() {
