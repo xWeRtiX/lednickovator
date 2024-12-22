@@ -57,8 +57,8 @@ async function searchPackages(name: string): Promise<PackageData[]> {
 
 export default function Home() {
   const [formData, setFormData] = useState<PackageData>({
-    fridge: '',
-    shelf: '',
+    fridge: 'Levá',
+    shelf: 'První',
     name: '',
   });
 
@@ -67,7 +67,7 @@ export default function Home() {
 
   const handleSave = async () => {
     await savePackage(formData);
-    setFormData({ ...formData, name: '' }); // Zachovat "fridge" a "shelf"
+    setFormData({ ...formData, name: '' });
   };
 
   const debouncedSearch = debounce(async (name: string) => {
@@ -98,24 +98,28 @@ export default function Home() {
           Přidat balíček
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <input
+          <select
             className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-black"
-            type="text"
-            placeholder="Lednice"
             value={formData.fridge}
             onChange={(e) =>
               setFormData({ ...formData, fridge: e.target.value })
             }
-          />
-          <input
+          >
+            <option value="Levá">Levá</option>
+            <option value="Pravá">Pravá</option>
+          </select>
+          <select
             className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-black"
-            type="text"
-            placeholder="Polička"
             value={formData.shelf}
             onChange={(e) =>
               setFormData({ ...formData, shelf: e.target.value })
             }
-          />
+          >
+            <option value="První">První</option>
+            <option value="Druhá">Druhá</option>
+            <option value="Třetí">Třetí</option>
+            <option value="Čtvrtá">Čtvrtá</option>
+          </select>
           <input
             className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-black"
             type="text"
