@@ -71,6 +71,7 @@ export default function Home() {
   };
 
   const debouncedSearch = debounce(async (name: string) => {
+    if (!name.trim()) return setSearchResults([]);
     const results = await searchPackages(name);
     setSearchResults(results);
   }, 300);
