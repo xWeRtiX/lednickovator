@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import debounce from 'lodash.debounce';
 
 interface PackageData {
   fridge: string;
@@ -66,12 +67,23 @@ export default function Home() {
 
   const handleSave = async () => {
     await savePackage(formData);
-    setFormData({ fridge: '', shelf: '', name: '' });
+    setFormData({ ...formData, name: '' }); // Zachovat "fridge" a "shelf"
   };
 
-  const handleSearch = async () => {
-    const results = await searchPackages(searchName);
+  const debouncedSearch = debounce(async (name: string) => {
+    const results = await searchPackages(name);
     setSearchResults(results);
+  }, 300);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.value;
+    setSearchName(name);
+    debouncedSearch(name);
+  };
+
+  const handleClearSearch = () => {
+    setSearchName('');
+    setSearchResults([]);
   };
 
   return (
@@ -129,13 +141,13 @@ export default function Home() {
             type="text"
             placeholder="Vyhledat podle jména"
             value={searchName}
-            onChange={(e) => setSearchName(e.target.value)}
+            onChange={handleSearchChange}
           />
           <button
-            className="px-6 py-3 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            onClick={handleSearch}
+            className="px-6 py-3 bg-gray-500 text-white font-medium rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            onClick={handleClearSearch}
           >
-            Vyhledat
+            Vymazat
           </button>
         </div>
         <ul className="mt-4 divide-y divide-gray-200">
